@@ -3,7 +3,7 @@
 https://adventofcode.com/
 
 ## Stack
-- Node 14.17+
+- Node 16
 - pnpm (npm compatible)
 - Typescript
 - Jest 27
