@@ -1,5 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
+import dedent from 'dedent-js'
 
 /**
  * Read file as array of lines
@@ -12,6 +13,16 @@ export function readFileAsLines(filename: string): Array<string> {
     })
     .replace(/\n$/, '')
     .split('\n')
+}
+
+
+/**
+ * Split template string into string array (removes indentation).
+ * Useful to copy paste examples from description.
+ * @param str template string
+ */
+export function split(str: string | TemplateStringsArray): Array<string> {
+  return dedent(str).split('\n')
 }
 
 /**

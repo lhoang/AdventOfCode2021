@@ -1,14 +1,15 @@
 import { compute, computeAim, part1, part2 } from './Dive'
+import { split } from '../utils/input'
 
 describe('Dive', () => {
-  const instructions = [
-    'forward 5',
-    'down 5',
-    'forward 8',
-    'up 3',
-    'down 8',
-    'forward 2',
-  ]
+  const instructions = split`
+    forward 5
+    down 5
+    forward 8
+    up 3
+    down 8
+    forward 2
+  `
   it('should find coords', () => {
     expect(compute(instructions)).toEqual({
       x: 15,

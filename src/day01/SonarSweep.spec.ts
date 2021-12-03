@@ -1,7 +1,19 @@
 import { countIncreases, part1, part2, slidingWindow } from './SonarSweep'
+import { split } from '../utils/input'
 
 describe('Depth Measurement', () => {
-  const measures = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
+  const measures = split`
+    199
+    200
+    208
+    210
+    200
+    207
+    240
+    269
+    260
+    263
+    `.map(i => +i)
 
   it('should count increases', () => {
     expect(countIncreases(measures)).toBe(7)

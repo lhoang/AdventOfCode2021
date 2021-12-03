@@ -4,23 +4,23 @@ import {
   getLifeSupportRating,
   getPowerConsumption,
 } from './BinaryDiagnostic'
-import { readFileAsLines } from '../utils/input'
+import { readFileAsLines, split } from '../utils/input'
 
 describe('Binary Diagnostic', () => {
-  const report = [
-    '00100',
-    '11110',
-    '10110',
-    '10111',
-    '10101',
-    '01111',
-    '00111',
-    '11100',
-    '10000',
-    '11001',
-    '00010',
-    '01010',
-  ]
+  const report = split`
+    00100
+    11110
+    10110
+    10111
+    10101
+    01111
+    00111
+    11100
+    10000
+    11001
+    00010
+    01010
+  `
 
   it('should get the power consumption', () => {
     expect(getPowerConsumption(report)).toEqual(198)
