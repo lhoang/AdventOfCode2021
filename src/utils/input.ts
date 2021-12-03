@@ -15,7 +15,8 @@ export function readFileAsLines(filename: string): Array<string> {
 }
 
 /**
- * Generator of range
+ * Generator of range (closed).
+ * Ex: range(2, 5) === [2, 3, 4, 5]
  */
 export function range(start: number, end: number): Array<number> {
   return new Array(end - start + 1).fill(0).map((_, i) => i + start)
