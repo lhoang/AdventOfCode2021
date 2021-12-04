@@ -15,7 +15,6 @@ export function readFileAsLines(filename: string): Array<string> {
     .split('\n')
 }
 
-
 /**
  * Split template string into string array (removes indentation).
  * Useful to copy paste examples from description.
@@ -23,6 +22,22 @@ export function readFileAsLines(filename: string): Array<string> {
  */
 export function split(str: string | TemplateStringsArray): Array<string> {
   return dedent(str).split('\n')
+}
+
+export function splitByEmptyLine(arr: Array<string>): Array<Array<string>> {
+  return arr
+    .reduce(
+      (acc, line) => {
+        if (line === '') {
+          acc.push([])
+        } else {
+          acc[acc.length - 1].push(line)
+        }
+        return acc
+      },
+      [[]],
+    )
+    .filter(d => d.length)
 }
 
 /**

@@ -1,4 +1,4 @@
-import { range, readFileAsLines, split } from './input'
+import { range, readFileAsLines, split, splitByEmptyLine } from './input'
 
 describe('Input utils', () => {
   it('should read file as lines', () => {
@@ -13,6 +13,24 @@ describe('Input utils', () => {
       !
     `
     expect(split(str)).toEqual(['hello', 'world', '!'])
+  })
+
+  it('should split string[] by empty string', () => {
+    const str = split`
+      hello
+      world
+      
+      Yo
+      
+      12345
+      
+    `
+
+    expect(splitByEmptyLine(str)).toEqual([
+      ['hello', 'world'],
+      ['Yo'],
+      ['12345'],
+    ])
   })
 
   it('should generate range', () => {
