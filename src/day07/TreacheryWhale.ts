@@ -69,7 +69,8 @@ export function getFuelConsumptionCrab(
 }
 
 export function trigular(n: number): number {
-  return range(0, n).reduce((acc, i) => acc + i)
+  // return range(0, n).reduce((acc, i) => acc + i)
+  return (n * (n + 1)) / 2
 }
 
 export function computeMinFuelConsumption(input: number[]): number {
