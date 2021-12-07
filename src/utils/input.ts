@@ -7,12 +7,27 @@ import dedent from 'dedent-js'
  * @param filename path from src/
  */
 export function readFileAsLines(filename: string): Array<string> {
-  return fs
-    .readFileSync(path.resolve(__dirname, '..', filename), {
-      encoding: 'utf-8',
-    })
-    .replace(/\n$/, '')
-    .split('\n')
+  return readFile(filename).replace(/\n$/, '').split('\n')
+}
+
+/**
+ * Read file as simple string
+ * @param filename path from src/
+ */
+export function readFile(filename: string): string {
+  return fs.readFileSync(path.resolve(__dirname, '..', filename), {
+    encoding: 'utf-8',
+  })
+}
+
+/**
+ * Read file as simple string
+ * @param filename path from src/
+ */
+export function readFileAsNumArray(filename: string): number[] {
+  return readFile(filename)
+    .split(',')
+    .map(i => +i)
 }
 
 /**

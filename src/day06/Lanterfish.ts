@@ -1,7 +1,3 @@
-export function parse(input: string[]): number[] {
-  return input[0].split(',').map(i => +i)
-}
-
 export function naiveReproduce(fishes: number[]) {
   let newFishes = 0
 
