@@ -18,7 +18,7 @@ export function naiveReproduceForDays(
 ): number[] {
   for (let i = 0; i < days; i++) {
     naiveReproduce(fishes)
-    console.log(`Day ${i + 1}: ${fishes.length}`)
+    //console.log(`Day ${i + 1}: ${fishes.length}`)
   }
   return fishes
 }
@@ -46,7 +46,7 @@ export function reproduceForDays(input: number[], days: number): BigInt {
 
   for (let i = 0; i < days; i++) {
     repro()
-    console.log(`Day ${i + 1}: ${count()}`)
+    // console.log(`Day ${i + 1}: ${count()}`)
   }
   return count()
 }

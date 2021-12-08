@@ -1,5 +1,4 @@
 import { countBy, identity } from 'ramda'
-import { range } from '../utils/input'
 
 export function getRepartition(input: number[]): Record<number, number> {
   return countBy(identity, input)

@@ -1,4 +1,4 @@
-import { readFile, readFileAsNumArray } from '../utils/input'
+import { readFileAsNumArray } from '../utils/input'
 import {
   computeMinFuelConsumption,
   computeMinFuelConsumptionCrab,
