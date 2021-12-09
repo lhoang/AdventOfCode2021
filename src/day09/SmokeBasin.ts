@@ -1,5 +1,6 @@
 import { range } from '../utils/input'
 import { uniqBy } from 'ramda'
+import { color, colors } from '../utils/string'
 
 export type Grid = number[][]
 export type Coord = {
@@ -123,7 +124,11 @@ export function display(grid: Grid, basin: Point[]) {
 
   const rows = fullGrid
     .map(row =>
-      row.map(p => (p.basin ? '\x1b[33m' + p.v + '\x1b[0m' : p.v)).join(''),
+      row
+        .map(p =>
+          p.basin ? color(p.v, colors.bg.yellow, colors.fg.black) : p.v,
+        )
+        .join(''),
     )
     .join('\n')
 
