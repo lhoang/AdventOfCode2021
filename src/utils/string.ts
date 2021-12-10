@@ -8,6 +8,7 @@ type Color =
   | 'cyan'
   | 'white'
   | 'crimson'
+  | 'grey'
 
 type Util = 'reset' | 'bright' | 'dim' | 'underscore' | 'blink' | 'reverse'
 
@@ -33,6 +34,7 @@ export const colors: Colors = {
     magenta: '\x1b[35m',
     cyan: '\x1b[36m',
     white: '\x1b[37m',
+    grey: '\x1b[90m',
     crimson: '\x1b[38m', // Scarlet
   },
   bg: {
@@ -44,6 +46,7 @@ export const colors: Colors = {
     magenta: '\x1b[45m',
     cyan: '\x1b[46m',
     white: '\x1b[47m',
+    grey: '\x1b[49;5;8m',
     crimson: '\x1b[48m',
   },
 }
