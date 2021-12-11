@@ -1,5 +1,6 @@
-import { color, colors } from '../utils/string'
-import { range } from '../utils/input'
+import { color, colors, sleep } from '../utils/display'
+import { range, split } from '../utils/input'
+import { stdout } from 'process'
 
 const { min, max } = Math
 
@@ -11,11 +12,6 @@ export type Coord = {
 
 export function parse(input: string[]): Grid {
   return input.map(line => line.split('').map(i => +i))
-}
-
-// TOdO use ?
-export function toString(grid: Grid): string {
-  return grid.map(line => line.join('')).join('\n')
 }
 
 export function flash({ x, y }: Coord, grid: Grid) {
@@ -84,3 +80,81 @@ export function findAllFlash(n: number, grid: Grid): number {
     return check()
   })
 }
+
+export function display(grid: Grid) {
+  if (stdout.cursorTo) {
+    stdout.cursorTo(0, 0)
+    const log = grid
+      .map(line =>
+        line
+          .map(c =>
+            // Ready to flash
+            c > 9
+              ? color('⚉', colors.fg.red, colors.bright)
+              : // has flashed
+              c == -1
+              ? color('☀', colors.fg.yellow, colors.bright)
+              : // tired
+              c == 0
+              ? color(c, colors.fg.yellow, colors.dim)
+              : c < 3
+              ? color(c, colors.fg.grey, colors.dim)
+              : c < 6
+              ? color(c, colors.fg.white, colors.dim)
+              : c < 8
+              ? color(c, colors.dim)
+              : color(c, colors.bright),
+          )
+          .join(' '),
+      )
+      .join('\r\n')
+    stdout.write(log)
+  }
+}
+
+export async function stepWithDisplay(grid: Grid): Promise<number> {
+  increaseEnergy(grid)
+
+  const recFlash = async (count: number): Promise<number> => {
+    const octopuses = findFlashingOctopuses(grid)
+    if (!octopuses.length) {
+      return count
+    } else {
+      octopuses.forEach(octo => flash(octo, grid))
+      display(grid)
+      await sleep(50)
+      return await recFlash(count + octopuses.length)
+    }
+  }
+  const count = await recFlash(0)
+  resetFlashingOctopuses(grid)
+
+  return count
+}
+
+async function run() {
+  console.clear()
+  const input = split`
+    5483143223
+    2745854711
+    5264556173
+    6141336146
+    6357385478
+    4167524645
+    2176841721
+    6882881134
+    4846848554
+    5283751526
+  `
+  const grid = parse(input)
+  const asyncStep = async () => {
+    await stepWithDisplay(grid)
+    display(grid)
+    await sleep(200)
+  }
+  for (const _ of range(1, 206)) {
+    await asyncStep()
+  }
+}
+
+run()

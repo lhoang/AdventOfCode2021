@@ -1,4 +1,4 @@
-import { color, colors } from './string'
+import { color, colors } from './display'
 
 describe('String Utils', () => {
   it('should color string ', () => {

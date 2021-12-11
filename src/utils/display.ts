@@ -54,3 +54,9 @@ export const colors: Colors = {
 export function color(str: string | number, ...args: string[]): string {
   return `${args.join('')}${str}${colors.reset}`
 }
+
+export async function sleep(ms) {
+  return new Promise(resolve => {
+    setTimeout(resolve, ms)
+  })
+}

@@ -1,5 +1,5 @@
 import { stdout } from 'process'
-import { color, colors } from '../utils/string'
+import { color, colors, sleep } from '../utils/display'
 import { split } from '../utils/input'
 
 const errorScoreMap = {
@@ -99,10 +99,6 @@ export async function visualizeLine(line: string): Promise<void> {
     }
     display(i, c, missing, corrupted)
   }
-  const sleep = ms =>
-    new Promise(resolve => {
-      setTimeout(resolve, ms)
-    })
 
   function display(i: number, c: string, missing: string, corrupted?: string) {
     const current = corrupted

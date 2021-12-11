@@ -18,3 +18,11 @@ pnpm i
 ```shell
 pnpm run test
 ```
+
+## Build
+For a few days, I have some visualization in the console.
+```shell
+pnpm run build
+node dist/day10/SyntaxScoring.js 
+node dist/day11/DumboOctopus.js
+```

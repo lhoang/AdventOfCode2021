@@ -1,6 +1,6 @@
 import { range } from '../utils/input'
 import { uniqBy } from 'ramda'
-import { color, colors } from '../utils/string'
+import { color, colors } from '../utils/display'
 
 export type Grid = number[][]
 export type Coord = {
