@@ -152,6 +152,7 @@ async function run() {
     display(grid)
     await sleep(200)
   }
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   for (const _ of range(1, 206)) {
     await asyncStep()
   }
