@@ -4,7 +4,7 @@
   "description": "Code Challenge in Typescript",
   "main": "index.js",
   "scripts": {
-    "build": "esbuild --bundle src/day11/DumboOctopus.ts src/day10/SyntaxScoring.ts --outdir=dist --platform=node",
+    "build": "esbuild --bundle src/day15/Chiton.ts src/day11/DumboOctopus.ts src/day10/SyntaxScoring.ts --outdir=dist --platform=node",
     "test": "jest",
     "lint": "eslint . --ext .ts"
   },
