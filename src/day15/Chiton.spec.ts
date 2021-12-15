@@ -59,18 +59,22 @@ describe('Chiton', () => {
       '9,9': {
         distance: 45,
         parent: '8,9',
+        heuristic: 0,
       },
       '8,9': {
         distance: 40,
         parent: '8,8',
+        heuristic: 0,
       },
       '8,8': {
         distance: 35,
         parent: '0,0',
+        heuristic: 0,
       },
       '0,0': {
         distance: 0,
         parent: null,
+        heuristic: 0,
       },
     }
 
@@ -88,6 +92,6 @@ describe('Chiton', () => {
     const [risk, path] = shortestPath(realInput)
     const grid = parse(realInput)
     display(grid, path)
-    expect(risk).toEqual(40)
+    expect(risk).toEqual(373)
   })
 })

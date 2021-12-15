@@ -58,9 +58,10 @@ export function neighbours(
 export interface NodeInfo {
   distance: number
   parent: string
+  heuristic: number
 }
 
-export function shortestPath(input: string[]): [number, string[]] {
+export function shortestPath(input: string[]): [number, string[], string[]] {
   const [riskMap, width, height] = parseToNodes(input)
   const grid = parse(input)
 
@@ -68,17 +69,22 @@ export function shortestPath(input: string[]): [number, string[]] {
   const finish = serialize({ x: width - 1, y: height - 1 })
   const nodeInfos: Record<string, NodeInfo> = Object.assign(
     {},
-    ...[...riskMap.keys()].map(nodeId => ({
-      [nodeId]: {
-        distance: Infinity,
-        parent: start,
-      },
-    })),
+    ...[...riskMap.keys()].map(nodeId => {
+      const { x, y } = deserialize(nodeId)
+      return {
+        [nodeId]: {
+          distance: Infinity,
+          parent: start,
+          heuristic: width + height - x - y - 2,
+        },
+      }
+    }),
   )
   // Init : start node and current neighbours
   nodeInfos[start] = {
     distance: 0,
     parent: null,
+    heuristic: width + height,
   }
   const visitedNodes: string[] = []
   // neighbours('0,0', width, height).forEach(nodeId => {
@@ -101,6 +107,7 @@ export function shortestPath(input: string[]): [number, string[]] {
         nodeInfos[nodeId] = {
           distance: newDistance,
           parent: currentNode,
+          heuristic: nodeInfos[nodeId].heuristic,
         }
       }
     })
@@ -110,7 +117,9 @@ export function shortestPath(input: string[]): [number, string[]] {
     // select new closest node
     const nextNodes = Object.entries(nodeInfos)
       .filter(([nodeId]) => !visitedNodes.includes(nodeId))
-      .sort(([, a], [, b]) => a.distance - b.distance)
+      .sort(
+        ([, a], [, b]) => a.distance + a.heuristic - b.distance - b.heuristic,
+      )
 
     if (!nextNodes.length) {
       end = true
@@ -123,12 +132,12 @@ export function shortestPath(input: string[]): [number, string[]] {
 
     // display temp
     count++
-    if (count % 1 == 0) {
-      display(grid, buildPath(currentNode, nodeInfos))
+    if (count % 100 == 0) {
+      display(grid, buildPath(currentNode, nodeInfos), visitedNodes)
     }
   }
   const risk = nodeInfos[finish].distance
-  return [risk, buildPath(finish, nodeInfos)]
+  return [risk, buildPath(finish, nodeInfos), visitedNodes]
 }
 
 export function buildPath(
@@ -145,7 +154,7 @@ export function buildPath(
   return path
 }
 
-export function display(grid: Grid, path: string[]) {
+export function display(grid: Grid, path: string[], visited: string[] = []) {
   if (stdout.cursorTo) {
     stdout.cursorTo(0, 0)
     //const pathMap = path.map(chiton => [serialize(chiton), chiton.risk])
@@ -157,19 +166,27 @@ export function display(grid: Grid, path: string[]) {
       .map((_j, j) =>
         Array(width + 1)
           .fill(0)
-          .map((_i, i) => ({ v: grid[j][i], path: false })),
+          .map((_i, i) => ({ v: grid[j][i], path: false, visited: false })),
       )
 
     path.map(deserialize).forEach(({ x, y }) => (fullGrid[y][x].path = true))
+    visited
+      .map(deserialize)
+      .forEach(({ x, y }) => (fullGrid[y][x].visited = true))
+
     const rows = fullGrid
       .map(row =>
         row
           .map(p =>
-            p.path ? color(p.v, colors.bg.yellow, colors.fg.black) : p.v,
+            p.path
+              ? color(p.v, colors.bg.yellow, colors.fg.black)
+              : p.visited
+              ? color(p.v, colors.bg.blue, colors.fg.black)
+              : p.v,
           )
           .join(''),
       )
-      .join('\n')
+      .join('\r\n')
 
     stdout.write(rows)
   }
@@ -190,7 +207,10 @@ async function run() {
     2311944581
   `
   const realInput = readFileAsLines('../src/day15/input.txt')
-  const [risk, path] = shortestPath(realInput)
+  const [risk, path, visited] = shortestPath(realInput)
+  //const grid = parse(realInput)
+  //display(grid, path, visited)
+  //console.log('Risk ' + risk)
   // const asyncStep = async () => {
   //   // await stepWithDisplay(grid)
   //   display(grid)
