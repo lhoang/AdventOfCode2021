@@ -1,12 +1,14 @@
-import { readFileAsLines, split } from '../utils/input'
+import { readFileAsLines, split, time } from '../utils/input'
 import {
   buildPath,
   display,
   neighbours,
   NodeInfo,
   parse,
+  parseRealMapToNodes,
   parseToNodes,
   shortestPath,
+  shortestPath2,
 } from './Chiton'
 
 const realInput = readFileAsLines('day15/input.txt')
@@ -82,16 +84,39 @@ describe('Chiton', () => {
   })
 
   it('should find shortest path', () => {
-    const [risk, path] = shortestPath(input)
-    const grid = parse(input)
-    display(grid, path)
-    expect(risk).toEqual(40)
+    time(() => {
+      const [risk, path] = shortestPath(input)
+      const grid = parse(input)
+      display(grid, path)
+      expect(risk).toEqual(40)
+    })
   })
 
   it('should find shortest path ⭐', () => {
-    const [risk, path] = shortestPath(realInput)
-    const grid = parse(realInput)
-    display(grid, path)
-    expect(risk).toEqual(373)
+    time(() => {
+      const [risk, path] = shortestPath(realInput)
+      const grid = parse(realInput)
+      display(grid, path)
+      expect(risk).toEqual(373)
+    })
+  })
+
+  it('should parse to real map nodes (part 2)', () => {
+    const [nodesMap, width, height] = parseRealMapToNodes(input)
+    expect(nodesMap.size).toEqual(2500)
+    expect(nodesMap.get('2,1')).toEqual(8)
+    expect(nodesMap.get('49,0')).toEqual(6)
+    expect(nodesMap.get('12,8')).toEqual(1)
+    expect(width).toEqual(50)
+    expect(height).toEqual(50)
+  })
+
+  it('should find shortest path 2', () => {
+    time(() => {
+      const [risk, path] = shortestPath2(input)
+      const grid = parse(input)
+      display(grid, path)
+      expect(risk).toEqual(315)
+    })
   })
 })

@@ -1,6 +1,7 @@
 import * as fs from 'fs'
 import * as path from 'path'
 import dedent from 'dedent-js'
+import { performance } from 'perf_hooks'
 
 /**
  * Read file as array of lines
@@ -63,4 +64,17 @@ export function range(start: number, end: number): Array<number> {
   return start <= end
     ? new Array(end - start + 1).fill(0).map((_, i) => i + start)
     : new Array(start - end + 1).fill(0).map((_, i) => start - i)
+}
+
+export function time(wrapped: () => void, second = false) {
+  let unit = 'ms'
+  let div = 1
+  if (second) {
+    unit = 's'
+    div = 1000
+  }
+  const startTime = performance.now()
+  wrapped()
+  const endTime = performance.now()
+  console.log(`Time: ${(endTime - startTime) / div} ${unit}`)
 }

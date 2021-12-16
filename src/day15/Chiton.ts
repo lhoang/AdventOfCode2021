@@ -2,7 +2,6 @@ import { stdout } from 'process'
 import { range, readFileAsLines, split } from '../utils/input'
 import { color, colors, sleep } from '../utils/display'
 
-const { min, max } = Math
 export type Grid = number[][]
 export interface Coord {
   x: number
@@ -11,7 +10,6 @@ export interface Coord {
 export interface Chiton extends Coord {
   risk: number
 }
-type Path = Chiton[]
 
 const serialize = ({ x, y }: Coord): string => `${x},${y}`
 const deserialize = (s: string): Coord => {
@@ -38,6 +36,27 @@ export function parseToNodes(
     width,
     height,
   ]
+}
+
+export function parseRealMapToNodes(
+  input: string[],
+): [Map<string, number>, number, number] {
+  const width = input[0].length
+  const height = input.length
+
+  const map = new Map<string, number>()
+  input.forEach((line, j) =>
+    line.split('').forEach((v, i) => {
+      range(0, 4).forEach(dj =>
+        range(0, 4).forEach(di => {
+          const value = (+v + di + dj) % 10 === 0 ? 1 : (+v + di + dj) % 10
+          map.set(serialize({ x: i + width * di, y: j + height * dj }), value)
+        }),
+      )
+    }),
+  )
+
+  return [map, width * 5, height * 5]
 }
 
 export function neighbours(
@@ -86,10 +105,7 @@ export function shortestPath(input: string[]): [number, string[], string[]] {
     parent: null,
     heuristic: width + height,
   }
-  const visitedNodes: string[] = []
-  // neighbours('0,0', width, height).forEach(nodeId => {
-  //   nodeInfos[nodeId] = riskMap.get(nodeId)
-  // })
+  const visitedNodes = new Set<string>()
 
   let currentNode = start
   let end = false
@@ -112,13 +128,14 @@ export function shortestPath(input: string[]): [number, string[], string[]] {
       }
     })
     // Tag as visited
-    visitedNodes.push(currentNode)
+    visitedNodes.add(currentNode)
 
     // select new closest node
     const nextNodes = Object.entries(nodeInfos)
-      .filter(([nodeId]) => !visitedNodes.includes(nodeId))
+      .filter(([nodeId]) => !visitedNodes.has(nodeId))
       .sort(
-        ([, a], [, b]) => a.distance + a.heuristic - b.distance - b.heuristic,
+        ([, a], [, b]) =>
+          a.distance - b.distance + 1.6 * (a.heuristic - b.heuristic),
       )
 
     if (!nextNodes.length) {
@@ -132,12 +149,13 @@ export function shortestPath(input: string[]): [number, string[], string[]] {
 
     // display temp
     count++
-    if (count % 100 == 0) {
-      display(grid, buildPath(currentNode, nodeInfos), visitedNodes)
+    if (count % 500 == 0) {
+      //   console.log('visited :' + visitedNodes.size)
+      display(grid, buildPath(currentNode, nodeInfos), [...visitedNodes])
     }
   }
   const risk = nodeInfos[finish].distance
-  return [risk, buildPath(finish, nodeInfos), visitedNodes]
+  return [risk, buildPath(finish, nodeInfos), [...visitedNodes]]
 }
 
 export function buildPath(
@@ -152,6 +170,84 @@ export function buildPath(
     parent = nodeInfos[parent].parent
   }
   return path
+}
+
+export function shortestPath2(input: string[]): [number, string[], string[]] {
+  const [riskMap, width, height] = parseRealMapToNodes(input)
+  const grid = parse(input)
+
+  const start = '0,0'
+  const finish = serialize({ x: width - 1, y: height - 1 })
+  const nodeInfos: Record<string, NodeInfo> = Object.assign(
+    {},
+    ...[...riskMap.keys()].map(nodeId => {
+      const { x, y } = deserialize(nodeId)
+      return {
+        [nodeId]: {
+          distance: Infinity,
+          parent: start,
+          heuristic: width + height - x - y - 2,
+        },
+      }
+    }),
+  )
+  // Init : start node and current neighbours
+  nodeInfos[start] = {
+    distance: 0,
+    parent: null,
+    heuristic: width + height,
+  }
+  const visitedNodes = new Set<string>()
+
+  let currentNode = start
+  let end = false
+
+  let count = 0
+  while (!end) {
+    // Update distance for all the neighbours
+    const neighbourNodes = neighbours(currentNode, width, height)
+    const { distance } = nodeInfos[currentNode]
+    neighbourNodes.forEach(nodeId => {
+      const newDistance = distance + riskMap.get(nodeId)
+      const previousDistance = nodeInfos[nodeId].distance
+      // update distance if smaller
+      if (newDistance < previousDistance) {
+        nodeInfos[nodeId] = {
+          distance: newDistance,
+          parent: currentNode,
+          heuristic: nodeInfos[nodeId].heuristic,
+        }
+      }
+    })
+    // Tag as visited
+    visitedNodes.add(currentNode)
+
+    // select new closest node
+    const nextNodes = Object.entries(nodeInfos)
+      .filter(([nodeId]) => !visitedNodes.has(nodeId))
+      .sort(
+        ([, a], [, b]) =>
+          a.distance - b.distance + 1.6 * (a.heuristic - b.heuristic),
+      )
+
+    if (!nextNodes.length) {
+      end = true
+    } else {
+      currentNode = nextNodes[0][0]
+      if (currentNode === finish) {
+        end = true
+      }
+    }
+
+    // display temp
+    count++
+    if (count % 500 == 0) {
+      //   console.log('visited :' + visitedNodes.size)
+      display(grid, buildPath(currentNode, nodeInfos), [...visitedNodes])
+    }
+  }
+  const risk = nodeInfos[finish].distance
+  return [risk, buildPath(finish, nodeInfos), [...visitedNodes]]
 }
 
 export function display(grid: Grid, path: string[], visited: string[] = []) {
@@ -179,9 +275,9 @@ export function display(grid: Grid, path: string[], visited: string[] = []) {
         row
           .map(p =>
             p.path
-              ? color(p.v, colors.bg.yellow, colors.fg.black)
+              ? color(p.v, colors.bg.red, colors.fg.black)
               : p.visited
-              ? color(p.v, colors.bg.blue, colors.fg.black)
+              ? color(p.v, colors.bg.white, colors.fg.black)
               : p.v,
           )
           .join(''),
@@ -206,11 +302,13 @@ async function run() {
     1293138521
     2311944581
   `
-  const realInput = readFileAsLines('../src/day15/input.txt')
-  const [risk, path, visited] = shortestPath(realInput)
-  //const grid = parse(realInput)
-  //display(grid, path, visited)
-  //console.log('Risk ' + risk)
+  if (stdout.cursorTo) {
+    const realInput = readFileAsLines('../src/day15/input.txt')
+    const [risk, path, visited] = shortestPath2(input)
+    const grid = parse(input)
+    display(grid, path, visited)
+    console.log('Risk ' + risk)
+  }
   // const asyncStep = async () => {
   //   // await stepWithDisplay(grid)
   //   display(grid)
