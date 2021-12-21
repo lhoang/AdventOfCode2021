@@ -1,38 +1,32 @@
-import { explode, finalSum, Pair, register, split } from './Snailfish'
-import { split as splitInput } from '../utils/input'
+import {
+  explode,
+  finalSum,
+  findLargestMagnitude,
+  Pair,
+  register,
+  split,
+} from './Snailfish'
+import { readFileAsLines, split as splitInput } from '../utils/input'
+
+const realInput = readFileAsLines('day18/input.txt')
+const input = splitInput`
+      [[[0,[5,8]],[[1,7],[9,6]]],[[4,[1,2]],[[1,4],2]]]
+      [[[5,[2,8]],4],[5,[[9,9],0]]]
+      [6,[[[6,2],[5,6]],[[7,6],[4,7]]]]
+      [[[6,[0,7]],[0,9]],[4,[9,[9,0]]]]
+      [[[7,[6,4]],[3,[1,3]]],[[[5,5],1],9]]
+      [[6,[[7,3],[3,2]]],[[[3,8],[5,7]],4]]
+      [[[[5,4],[7,7]],8],[[8,3],8]]
+      [[9,3],[[9,9],[6,[4,9]]]]
+      [[2,[[7,7],7]],[[5,8],[[9,3],[0,2]]]]
+      [[[[5,2],5],[8,[3,7]]],[[5,[7,5]],[4,4]]]
+    `
 
 describe('Snailfish', () => {
   const test = '[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]] '
   const testPair = Pair.parse(test)
 
   it('should build Pair', () => {
-    // expect(Pair.parse('[2,3]')).toEqual({
-    //   id: 'root',
-    //   depth: 0,
-    //   left: 2,
-    //   right: 3,
-    // })
-    // const pair = Pair.parse('[[2,3],[4,5]]')
-    // expect(pair).toEqual({
-    //   id: 'root',
-    //   parent: null,
-    //   depth: 0,
-    //   left: {
-    //     id: 'L1',
-    //     parent: 'root',
-    //     depth: 1,
-    //     left: 2,
-    //     right: 3,
-    //   },
-    //   right: {
-    //     id: 'R1',
-    //     parent: 'root',
-    //     depth: 1,
-    //     left: 4,
-    //     right: 5,
-    //   },
-    // })
-
     const testPair = Pair.parse(test)
     expect(testPair).toEqual({
       depth: 0,
@@ -142,28 +136,6 @@ describe('Snailfish', () => {
     expect(res).toBeFalsy()
   })
 
-  it('should explode 2 ', () => {
-    // const test = Pair.parse('[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]')
-    // explode(test)
-    // expect(test.toString()).toEqual('[[[[0,7],4],[[7,8],[6,0]]],[8,1]]')
-    //
-    // const test2 = Pair.parse(
-    //   '[[[[4,0],[5,4]],[[7,7],[6,0]]],[[12,[5,5]],[[0,[[5,5],[5,5]]],[0,6]]]]',
-    // )
-    // explode(test2)
-    // expect(test2.toString()).toEqual(
-    //   '[[[[4,0],[5,4]],[[7,7],[6,0]]],[[12,[5,5]],[[5,[0,[10,5]]],[0,6]]]]',
-    // )
-
-    const test3 = Pair.parse(
-      '[[[[5,11],[13,0]],[[8,[7,7]],[[7,9],[5,0]]]],[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]]',
-    )
-    explode(test3)
-    expect(test3.toString()).toEqual(
-      '[[[[5,24],0],[[8,[7,7]],[[7,9],[5,0]]]],[[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]]',
-    )
-  })
-
   it('should split', () => {
     const test1 = Pair.parse('[[[[0,7],4],[15,[0,13]]],[1,1]]')
     let res = split(test1)
@@ -174,6 +146,16 @@ describe('Snailfish', () => {
     expect(test1.toString()).toEqual('[[[[0,7],4],[[7,8],[0,[6,7]]]],[1,1]]')
     res = split(test1)
     expect(res).toBeFalsy()
+  })
+
+  it('should split 2', () => {
+    const test = Pair.parse(
+      '[[[[7,6],[0,6]],[[20,14],[14,0]]],[[2,[11,10]],[[0,8],[8,0]]]]',
+    )
+    split(test)
+    expect(test.toString()).toEqual(
+      '[[[[7,6],[0,6]],[[[10,10],14],[14,0]]],[[2,[11,10]],[[0,8],[8,0]]]]',
+    )
   })
 
   it('should reduce', () => {
@@ -195,18 +177,67 @@ describe('Snailfish', () => {
   })
 
   it('should compute final sum - bigger', () => {
-    // const test1 = finalSum(splitInput`
-    //   [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
-    //   [7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
-    //   [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
-    // `)
-
     const test1 = finalSum(splitInput`
-      [[[[4,0],[5,4]],[[7,7],[6,0]]],[[8,[7,7]],[[7,9],[5,0]]]]
+      [[[0,[4,5]],[0,0]],[[[4,5],[2,6]],[9,5]]]
+      [7,[[[3,7],[4,3]],[[6,3],[8,8]]]]
       [[2,[[0,8],[3,4]]],[[[6,7],1],[7,[1,6]]]]
+      [[[[2,4],7],[6,[0,5]]],[[[6,8],[2,8]],[[2,1],[4,5]]]]
+      [7,[5,[[3,8],[1,4]]]]
+      [[2,[2,2]],[8,[8,1]]]
+      [2,9]
+      [1,[[[9,3],9],[[9,0],[0,7]]]]
+      [[[5,[7,4]],7],1]
+      [[[[4,2],2],6],[8,7]]
     `)
+
     expect(test1.toString()).toEqual(
-      '[[[[6,7],[6,7]],[[7,7],[0,7]]],[[[8,7],[7,7]],[[8,8],[8,0]]]]',
+      '[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]',
     )
+
+    const test2 = finalSum(input)
+
+    expect(test2.toString()).toEqual(
+      '[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]',
+    )
+  })
+
+  it('should compute magnitude', () => {
+    expect(Pair.parse('[[1,2],[[3,4],5]]').magnitude()).toEqual(143)
+    expect(
+      Pair.parse(
+        '[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]',
+      ).magnitude(),
+    ).toEqual(3488)
+
+    expect(
+      Pair.parse(
+        '[[[[6,6],[7,6]],[[7,7],[7,0]]],[[[7,7],[7,7]],[[7,8],[9,9]]]]',
+      ).magnitude(),
+    ).toEqual(4140)
+  })
+
+  it('should compute real magnitude ⭐️', () => {
+    expect(finalSum(realInput).magnitude()).toEqual(4033)
+  })
+
+  it.skip('should check magnitude ', () => {
+    const lines = input
+      .map(Pair.parse)
+      .sort((a, b) => a.magnitude() - b.magnitude())
+      .map(
+        pair =>
+          `${pair.magnitude()} - ${pair.countDepth()} - ${pair.toString()}`,
+      )
+      .join('\n')
+
+    console.log(lines)
+  })
+
+  it('should find the largest magnitude', () => {
+    expect(findLargestMagnitude(input)).toEqual(3993)
+  })
+
+  it('should find the largest magnitude ⭐️⭐️', () => {
+    expect(findLargestMagnitude(realInput)).toEqual(4864)
   })
 })

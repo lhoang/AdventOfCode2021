@@ -1,3 +1,5 @@
+import { countBy } from 'ramda'
+
 interface PairParams {
   id: string
   left: number | Pair
@@ -97,14 +99,27 @@ export class Pair {
     let hasSplitted = false
     if (!hasExploded) {
       hasSplitted = split(this)
-      console.log(`Splitted: ${this.toString()}`)
+      //console.log(`splitted:${this.toString()}`)
     } else {
-      console.log(`Exploded: ${this.toString()}`)
+      // console.log(`exploded:${this.toString()}`)
     }
 
     if (hasSplitted || hasExploded) {
       this.reduce()
     }
+  }
+
+  magnitude(): number {
+    const mag = (n: number | Pair): number =>
+      isNumber(n) ? (n as number) : (n as Pair).magnitude()
+
+    return 3 * mag(this.left) + 2 * mag(this.right)
+  }
+
+  countDepth() {
+    const map = register(this)
+    const count = countBy(([, v]) => v.depth, [...map.entries()])
+    return JSON.stringify(count)
   }
 }
 
@@ -218,8 +233,7 @@ export function split(pair: Pair) {
         id: found.id + 'L',
         depth: found.depth + 1,
       })
-    }
-    if (tooBig(found.right)) {
+    } else if (tooBig(found.right)) {
       const value = found.right as number
       found.right = new Pair({
         left: Math.floor(value / 2),
@@ -243,4 +257,13 @@ export function add(pair1: Pair, pair2: Pair): Pair {
 
 export function finalSum(input: string[]): Pair {
   return input.map(Pair.parse).reduce(add)
+}
+
+export function findLargestMagnitude(input: string[]): number {
+  const allMagnitudes = input.flatMap(line =>
+    input
+      .filter(l => l !== line)
+      .map(l => add(Pair.parse(line), Pair.parse(l)).magnitude()),
+  )
+  return Math.max(...allMagnitudes)
 }
